@@ -15,6 +15,13 @@
         .finds-chart-container h2 { text-align: center; color: #495057; margin: 0 0 1em 0; }
         #seasonalChart { height: 500px !important; width: 100% !important; }
 
+        .cache-details { margin: 0 0 2em 0; padding: 1em; background: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6; }
+        .cache-details h2 { margin: 0 0 1em 0; color: #495057; }
+        .cache-details-table { border-collapse: collapse; margin-bottom: 1em; }
+        .cache-details-table th { text-align: left; padding: 0.4em 1em 0.4em 0; color: #495057; }
+        .cache-details-table td { padding: 0.4em 0; }
+        .cache-details a { color: #007bff; text-decoration: none; }
+        .cache-details a:hover { text-decoration: underline; }
 
         .chart-placeholder { height: 300px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; margin-bottom: 2em; border-radius: 8px; font-size: 1.5em; color: #888; }
         body { font-family: sans-serif; max-width: 1400px; margin: auto; padding: 0 2em 2em 2em; }
@@ -129,8 +136,9 @@
         <h1>Hauraki Rail Trail Geocache Statistics</h1>
                     
     </div>
-    <div class="cache-count">Showing 138 caches (built: 2026-11-25 11:47:03)</div>
+    <div class="cache-count">Showing 138 caches (built: 2026-11-25 11:56:42)</div>
     <div id="map"></div>
+    
     <div class="section-columns">
             <div class="section-column">
                 <h3>Section 1</h3>
@@ -230,30 +238,34 @@
     // Store markers in a global object for access by zoomToCache function
     window.cacheMarkers = {};
     
+    const isMainPage = true;
+
     caches.forEach(cache => {
         var color = getColor(cache);
-        var status = cache.archived ? ' (ARCHIVED)' : '';
-        var orderInfo = cache.order ? `Order: ${cache.order}` : '';
-        
-        // Create enhanced popup content
-        var popupContent = `
-            <div style="min-width: 250px;">
-                <b>${cache.name}${status}</b><br>
-                <strong>ID:</strong> ${cache.id}<br>
-                <strong>Owner:</strong> ${cache.author || 'Unknown'}<br>
-                <strong>Type:</strong> ${cache.type}<br>
-                <strong>Section:</strong> ${cache.section}<br>
-                <strong>Finds:</strong> ${cache.finds || 'N/A'}<br>
-                <br>
-                <a href="https://www.geocaching.com/geocache/${cache.id}" target="_blank" style="color: #007bff; text-decoration: none;">🌐 View on Geocaching.com</a><br>
-                <a href="caches/${cache.id}.html" style="color: #28a745; text-decoration: none;">📊 View Stats Page</a>
-            </div>
-        `;
-        
-        var marker = L.marker([cache.lat, cache.lon], {icon: createColoredIcon(color)}).addTo(map)
-            .bindPopup(popupContent);
+        var marker = L.marker([cache.lat, cache.lon], {icon: createColoredIcon(color)}).addTo(map);
+
+        if (isMainPage) {
+            var status = cache.archived ? ' (ARCHIVED)' : '';
+
+            // Create enhanced popup content
+            var popupContent = `
+                <div style="min-width: 250px;">
+                    <b>${cache.name}${status}</b><br>
+                    <strong>ID:</strong> ${cache.id}<br>
+                    <strong>Owner:</strong> ${cache.author || 'Unknown'}<br>
+                    <strong>Type:</strong> ${cache.type}<br>
+                    <strong>Section:</strong> ${cache.section}<br>
+                    <strong>Finds:</strong> ${cache.finds || 'N/A'}<br>
+                    <br>
+                    <a href="https://www.geocaching.com/geocache/${cache.id}" target="_blank" style="color: #007bff; text-decoration: none;">🌐 View on Geocaching.com</a><br>
+                    <a href="caches/${cache.id}.html" style="color: #28a745; text-decoration: none;">📊 View Stats Page</a>
+                </div>
+            `;
+            marker.bindPopup(popupContent);
+        }
+
         markers.push(marker.getLatLng());
-        
+
         // Store marker reference for zoomToCache function
         window.cacheMarkers[cache.id] = marker;
     });
