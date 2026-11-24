@@ -86,14 +86,50 @@
             z-index: 1;
             font-weight: bold;
         }
+
+        #page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1em;
+            z-index: 9999;
+            transition: opacity 0.25s ease;
+        }
+        #page-loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #page-loader .spinner {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #dee2e6;
+            border-top-color: #007bff;
+            border-radius: 50%;
+            animation: page-loader-spin 0.8s linear infinite;
+        }
+        #page-loader .loader-text {
+            color: #6c757d;
+            font-size: 0.95em;
+        }
+        @keyframes page-loader-spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
+    <div id="page-loader"><div class="spinner"></div><div class="loader-text">Loading map & stats…</div></div>
     <div class="page-header">
         <h1>Hauraki Rail Trail Geocache Statistics</h1>
                     
     </div>
-    <div class="cache-count">Showing 138 caches (built: 2026-08-29 17:23:23)</div>
+    <div class="cache-count">Showing 138 caches (built: 2026-11-25 11:22:52)</div>
     <div id="map"></div>
     <div class="section-columns">
             <div class="section-column">
@@ -228,7 +264,15 @@
     } else {
         map.setView([-37.8, 175.7], 7);
     }
-    
+
+    function hidePageLoader() {
+        var loader = document.getElementById('page-loader');
+        if (loader) loader.classList.add('hidden');
+    }
+    map.whenReady(hidePageLoader);
+    // Safety net in case whenReady never fires (e.g. tile layer blocked)
+    setTimeout(hidePageLoader, 4000);
+
     // Function to zoom to a specific cache and open its popup
     window.zoomToCache = function(cacheId) {
         const marker = window.cacheMarkers[cacheId];
